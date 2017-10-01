@@ -1,0 +1,10 @@
+{
+  "Mysql": {
+      "database_name": "mysql",
+      "database_type": "mysql",
+      "server": "mysql",
+      "port": 3306,
+      "username": "root",
+      "password": "secret"
+  }
+}  
