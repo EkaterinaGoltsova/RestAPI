@@ -1,7 +1,7 @@
 {
   "Mysql": {
-      "database_name": "mysql",
-      "database_type": "mysql",
+      "name": "mysql",
+      "type": "mysql",
       "server": "mysql",
       "port": 3306,
       "username": "root",

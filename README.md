@@ -7,3 +7,9 @@ composer install
 docker-compose up -d
 
 --> api-test:8080/v1
+
+
+TODO! 
+- namespace
+
+- exeptions

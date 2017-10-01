@@ -25,15 +25,15 @@ $container['errorHandler'] = function ($c) {
 };
 
 $container['Database'] = function ($c) {
-  $setting = file_get_contents(__DIR__  . '/config/db.json');
-  $setting = json_decode($setting, true);
+  $settings = file_get_contents(__DIR__  . '/config/db.json');
+  $settings = json_decode($settings, true);
 
-  return  new Medoo\Medoo([
-      'database_type' => $setting['Mysql']['database_type'],
-      'database_name' => $setting['Mysql']['database_name'],
-      'server' => $setting['Mysql']['server'],
-      'username' => $setting['Mysql']['username'],
-      'password' => $setting['Mysql']['password'],
-      'port' => $setting['Mysql']['port']
+  return new Medoo\Medoo([
+      'database_type' => $settings['Mysql']['type'],
+      'database_name' => $settings['Mysql']['name'],
+      'server' => $settings['Mysql']['server'],
+      'username' => $settings['Mysql']['username'],
+      'password' => $settings['Mysql']['password'],
+      'port' => $settings['Mysql']['port']
   ]);
 };

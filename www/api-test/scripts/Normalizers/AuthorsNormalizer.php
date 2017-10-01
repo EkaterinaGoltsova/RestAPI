@@ -2,10 +2,16 @@
 
 require_once APP_PATH . 'Models/Authors.php';
 
+/**
+ * Класс для нормализации сущности "Автор"
+ */
 class AuthorNormalizer
 {
-
-	public function normalize($data)
+	
+	/**
+ 	 * @param array
+	 */
+	public function normalize(array $data)
 	{
 		$author = new Author();
 

@@ -4,44 +4,49 @@ use Slim\Http\Request as Request;
 use Slim\Http\Response as Response;
 
 require_once APP_PATH . 'DataSource/Authors.php';
+require_once APP_PATH . 'DataSource/Avatars.php';
+require_once APP_PATH . 'Controllers/BaseActionAuthor.php';
 
-class PutAuthors 
+/**
+ * Контроллер для обработки действия "обновить автора"
+ */
+class PutAuthors extends BaseActionAuthor
 {
 
-	protected $database;
-
-	public function __construct(Medoo\Medoo $database)
-	{
-		$this->source = new Authors($database);
-	}
-
+	/**
+	 * @param Request
+	 * @param Response
+	 * @param array $args
+	 * @return Response
+	 */
 	public function __invoke(Request $request, Response $response, array $args)
 	{
 		$params = $request->getParsedBody();
-		$file = $request->getUploadedFiles();
-
-		if (!empty($file)) {
-			$fileName = $this->getFileName($file);
-			$params = array_merge($params, ['avatar' => $fileName]);
+		$id = $request->getAttribute('authorId');
+		
+		try {
+			$this->sourceAuthors->update($params, ['id' => $id]);
+		} catch (Exception $e) {
+			throw new Exception('Ошибка при работе с базой данных. Попробуйте позже!');
 		}
 
-		$id = $request->getAttribute('authorId');
-		$test = $this->source->update($params, ['id' => $id]);
+		$file = $request->getUploadedFiles();
+		if ($file) {
+			$fileName = $this->upload($file);
+			try {
+				$this->sourceAvatars->update(
+					[
+						"file" => $fileName,
+						"width" => $this->getImgWidth($fileName),
+						"height" => $this->getImgHeight($fileName)
+					],
+					['author_id' => $authorId]
+				);
+			} catch (Exception $e) {
+				throw new Exception('Ошибка при работе с базой данных. Попробуйте позже!');
+			}
+		}
 
-		return $response->withJson(['result' =>'Автор - ' . $id . ' добновлен!'], 200);
-	}
-
-	protected function getFileName($file)
-	{
-		$file = reset($file);
-
-		$name = $file->getClientFilename();
-		$ext = pathinfo(trim($name), PATHINFO_EXTENSION);
-
-		$fileName = '/static/images/' . uniqid(rand()) . '.' . $ext;
-
-		file_put_contents($_SERVER['DOCUMENT_ROOT'] . $fileName, $file->getStream()->getContents());
-
-		return $fileName;
+		return $response->withJson(['result' =>'Автор - ' . $id . ' обновлен!'], 200);
 	}
 }

@@ -8,16 +8,34 @@ require_once APP_PATH . 'DataSource/Avatars.php';
 require_once APP_PATH . 'Normalizers/AuthorsNormalizer.php';
 require_once APP_PATH . 'Normalizers/AvatarNormalizer.php';
 
+/**
+ * Контроллер для обработки действия "получить автора"
+ */
 class GetAuthors 
 {
-
+	/**
+	 * @var Authors
+	 */
 	protected $sourceAuthors;
 
+	/**
+	 * @var Avatars
+	 */
+	protected $sourceAvatars;
+
+	/**
+	 * @var AuthorsNormalizer
+	 */
 	protected $normalizerAuthors;
 
+	/**
+	 * @var AvatarNormalizer
+	 */
 	protected $normalizerAvatar;
 
-
+	/**
+	 * @param Medoo\Medoo
+	 */
 	public function __construct(Medoo\Medoo $database)
 	{
 		$this->sourceAuthors = new Authors($database);
@@ -27,18 +45,43 @@ class GetAuthors
 		$this->normalizerAvatar = new AvatarNormalizer();
 	}
 
+	/**
+	 * @param Request
+	 * @param Response
+	 * @param array $args
+	 * @return Response
+	 */
 	public function __invoke(Request $request, Response $response, array $args)
 	{
 		$id = $request->getAttribute('authorId');
-		$data = $this->sourceAuthors->getById($id);
+		try {
+			$data = $this->sourceAuthors->getById($id);
+		} catch (Exception $e) {
+			throw new Exception('Ошибка при работе с базой данных. Попробуйте позже!');
+		}
+		
+		if (!$data) {
+			throw new Exception('Автор не найден!');
+		}
 
-		$avatar = $this->sourceAvatars->getByAuthorId($id);
-		$data2 = $this->normalizerAvatar->normalize($avatar);
+		$data['avatar'] = $this->getNormalizeAvatar($id);
 
-		$data['avatar'] = $data2;
+		$result = $this->normalizerAuthors->normalize($data);
+		return $response->withJson((array)$result, 200);
+	}
 
-		$data = $this->normalizerAuthors->normalize($data);
+	/**
+	 * @param int $authorId
+	 * @return Avatar
+	 */
+	protected function getNormalizeAvatar($authorId)
+	{
+		try {
+			$avatar = $this->sourceAvatars->getByAuthorId($authorId);
+		} catch (Exception $e) {
+			throw new Exception('Ошибка при работе с базой данных. Попробуйте позже!');
+		}
 
-		return $response->withJson((array)$data, 200);
+		return $this->normalizerAvatar->normalize($avatar);
 	}
 }

@@ -2,10 +2,15 @@
 
 require_once APP_PATH . 'Models/Avatars.php';
 
+/**
+ * Класс для нормализации сущности "Аватар"
+ */
 class AvatarNormalizer
 {
-
-	public function normalize($data)
+	/**
+ 	 * @param array
+	 */
+	public function normalize(array $data)
 	{
 		$avatar = new Avatar();
 

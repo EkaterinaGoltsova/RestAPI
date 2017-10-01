@@ -12,9 +12,11 @@ CREATE TABLE IF NOT EXISTS avatars(
 	  		file VARCHAR(80) NOT NULL,
 	  		width INT NOT NULL,
 	  		height INT NOT NULL,
-	  		author_id INT NOT NULL)
+	  		author_id INT NOT NULL,
+	  		INDEX (`author_id`)
+);
 
 ALTER TABLE `avatars`
- ADD CONSTRAINT `fk_authors_avatars`
-  FOREIGN KEY (`author_id`) REFERENCES `authors` (`id`) 
-  ON DELETE CASCADE ON UPDATE CASCADE;
+ 	ADD CONSTRAINT `fk_authors_avatars`
+ 	FOREIGN KEY (`author_id`) REFERENCES `authors` (`id`) 
+ 	ON DELETE CASCADE ON UPDATE CASCADE;
